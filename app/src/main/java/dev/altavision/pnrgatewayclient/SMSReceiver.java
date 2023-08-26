@@ -30,10 +30,10 @@ public class SMSReceiver extends BroadcastReceiver {
         String sender = message.getOriginatingAddress();
 
         // Check if the sender is in the list of allowed senders
-        if (!APIServer.gatewayAddresses.contains(sender)) {
-            Log.d(TAG,"Got message from sender "+sender+", not in allowed senders list, ignoring...");
-            return;
-        }
+//        if (!APIServer.gatewayAddresses.contains(sender)) {
+//            Log.d(TAG,"Got message from sender "+sender+", not in allowed senders list, ignoring...");
+//            return;
+//        }
 
         String messageBody = message.getMessageBody();
 
