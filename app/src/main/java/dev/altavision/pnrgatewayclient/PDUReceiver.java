@@ -13,44 +13,22 @@ import android.widget.Toast;
 import androidx.preference.PreferenceManager;
 
 public class PDUReceiver extends BroadcastReceiver {
-    private SharedPreferences mPrefs = null;
+    private static final String TAG = "PDU_RCVR";
 
     @Override
     public void onReceive(Context context, Intent intent) {
         //Runs whenever a data SMS PDU is received. On some carriers (i.e. AT&T), the REG-RESP message is sent as
         //  a data SMS (PDU) instead of a regular SMS message.
-
-        Log.d("PDU_RCVR", "Got data SMS!!");
-
-        mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        Log.d(TAG, "Received intent!");
 
         Bundle bundle = intent.getExtras();
-        SmsMessage recMsg = null;
-        byte[] data = null;
         if (bundle != null) {
             Object[] pdus = (Object[]) bundle.get("pdus");
-            Log.d("PDU_RCVR","Got received PDUs: "+pdus.toString());
 
-            //Loops through each received SMS
+            Log.d(TAG, "Got "+pdus.length+" PDUs");
+
             for (int i = 0; i < pdus.length; i++) {
-                recMsg = SmsMessage.createFromPdu((byte[]) pdus[i]);
-
-                if (mPrefs.getString("gateway_address","").trim().equals("")) {
-                    Toast.makeText(context, "Error: Please set the gateway address in Settings", Toast.LENGTH_SHORT).show();
-                    continue;
-                }
-
-                if (!recMsg.getOriginatingAddress().equals(mPrefs.getString("gateway_address", "<not set>"))) {
-                    continue;
-                }
-
-                //messageBody will include the REG-RESP text--i.e.
-                //  REG-RESP?v=3;r=72325403;n=+11234567890;s=CA21C50C645469B25F4B65C38A7DCEC56592E038F39489F35C7CD6972D
-                String messageBody = recMsg.getMessageBody();
-
-                //Hands the REG-RESP message off to the SMSReceiver to notify the user
-                SMSReceiver.processResponseMessage(messageBody, context);
-
+                SMSReceiver.processMessage(SmsMessage.createFromPdu((byte[]) pdus[i]));
             }
         }
     }
