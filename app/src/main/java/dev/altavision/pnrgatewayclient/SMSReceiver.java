@@ -24,10 +24,10 @@ import java.util.Random;
 public class SMSReceiver extends BroadcastReceiver {
     private static final String TAG = "SMS_RCVR";
 
-    public static void processMessage(SmsMessage message) {
+    public static void processMessage(String messageBody) {
         // Called by both the PDUReceiver and the SMSReceiver to process an incoming message
         //  and notify the user if it's a REG-REQ message
-        String sender = message.getOriginatingAddress();
+        //String sender = message.getOriginatingAddress();
 
         // Check if the sender is in the list of allowed senders
 //        if (!APIServer.gatewayAddresses.contains(sender)) {
@@ -35,9 +35,9 @@ public class SMSReceiver extends BroadcastReceiver {
 //            return;
 //        }
 
-        String messageBody = message.getMessageBody();
+        //String messageBody = message.getMessageBody();
 
-        Log.d(TAG,"Got message from sender "+sender+", processing...");
+        //Log.d(TAG,"Got message from sender "+sender+", processing...");
         APIServer.incomingMessages.add(messageBody);
     }
 
@@ -50,9 +50,8 @@ public class SMSReceiver extends BroadcastReceiver {
 
         SmsMessage[] extractMessages = Telephony.Sms.Intents.getMessagesFromIntent(intent);
 
-        for (int i = 0; i < extractMessages.length; i++) {
-            SmsMessage message = extractMessages[i];
-            processMessage(message);
+        for (SmsMessage message : extractMessages) {
+            processMessage(message.getMessageBody());
         }
 
     }
