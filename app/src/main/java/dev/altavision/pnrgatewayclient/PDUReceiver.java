@@ -11,8 +11,6 @@ import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.preference.PreferenceManager;
-
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -21,34 +19,34 @@ public class PDUReceiver extends BroadcastReceiver {
 
     private String parse(byte[] pdu) {
         // Print base64-encoded PDU
-        Log.d(TAG, "PDU: " + new String(Base64.encode(pdu, Base64.DEFAULT)));
-        SmsMessage message = SmsMessage.createFromPdu((byte[]) pdu, "3gpp");
-        if (message.getMessageBody() == null) {
-            Log.d(TAG, "Failed to get body using 3gpp parsing, trying 3gpp2...");
-            message = SmsMessage.createFromPdu((byte[]) pdu, "3gpp2");
-            if (message.getMessageBody() == null) {
-                Log.d(TAG, "Failed to get body using 3gpp2 parsing, manually parsing...");
-                // Remove non-ASCII characters from the PDU
-                String pduString = new String(pdu, 0, pdu.length, StandardCharsets.US_ASCII);
-                // Extract the message body from the PDU
-                int index = pduString.indexOf("REG-RESP");
-                if (index == -1) {
-                    Log.d(TAG, "Failed to get body using manual parsing, ignoring...");
-                    Log.d(TAG, "PDU: " + pduString);
-                    return null;
-                }
-                String messageBody = pduString.substring(index);
-                Log.d(TAG, "Got message body using manual parsing: " + messageBody);
-                return messageBody;
-            }
-        }
-        Log.d(TAG, "Got message body using 3gpp/3gpp2 parsing: " + message.getMessageBody());
-        // Check for REG-RESP message
-        if (!message.getMessageBody().contains("REG-RESP")) {
-            Log.d(TAG, "Got message that is not a REG-RESP, ignoring...");
+        Log.w(TAG, "PDU: " + new String(Base64.encode(pdu, Base64.DEFAULT)));
+//        SmsMessage message = SmsMessage.createFromPdu((byte[]) pdu, "3gpp");
+//        if (message.getMessageBody() == null) {
+//            Log.d(TAG, "Failed to get body using 3gpp parsing, trying 3gpp2...");
+//            message = SmsMessage.createFromPdu((byte[]) pdu, "3gpp2");
+//            if (message.getMessageBody() == null) {
+//                Log.d(TAG, "Failed to get body using 3gpp2 parsing, manually parsing...");
+//                // Remove non-ASCII characters from the PDU
+        String pduString = new String(pdu, 0, pdu.length, StandardCharsets.US_ASCII);
+        // Extract the message body from the PDU
+        int index = pduString.indexOf("REG-RESP");
+        if (index == -1) {
+            Log.w(TAG, "Failed to get body using manual parsing, ignoring...");
+            Log.w(TAG, "PDU: " + pduString);
             return null;
         }
-        return message.getMessageBody();
+        String messageBody = pduString.substring(index);
+        Log.w(TAG, "Got message body using manual parsing: " + messageBody);
+        return messageBody;
+//            }
+//        }
+//        Log.d(TAG, "Got message body using 3gpp/3gpp2 parsing: " + message.getMessageBody());
+//        // Check for REG-RESP message
+//        if (!message.getMessageBody().contains("REG-RESP")) {
+//            Log.d(TAG, "Got message that is not a REG-RESP, ignoring...");
+//            return null;
+//        }
+//        return message.getMessageBody();
     }
 
     @Override

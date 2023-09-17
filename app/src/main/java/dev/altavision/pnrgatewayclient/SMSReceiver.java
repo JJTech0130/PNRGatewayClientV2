@@ -14,8 +14,6 @@ import android.telephony.SmsMessage;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.core.app.NotificationCompat;
-import androidx.preference.PreferenceManager;
 
 import java.util.List;
 import java.util.Objects;
@@ -46,7 +44,7 @@ public class SMSReceiver extends BroadcastReceiver {
         //This runs whenever a regular SMS is received--i.e. to capture the incoming REG-REQ message from the iPhone so
         //  we can notify the user. The user should then paste the REG-RESP contents into the ReceivePNR command
         //  on the iPhone via SSH
-        Log.d(TAG, "Received intent!");
+        Log.w(TAG, "Received intent!");
 
         SmsMessage[] extractMessages = Telephony.Sms.Intents.getMessagesFromIntent(intent);
 
