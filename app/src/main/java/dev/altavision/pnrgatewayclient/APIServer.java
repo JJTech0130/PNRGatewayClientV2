@@ -1,6 +1,8 @@
 package dev.altavision.pnrgatewayclient;
 
+import android.content.Context;
 import android.telephony.SmsManager;
+import android.telephony.TelephonyManager;
 import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
@@ -28,6 +30,8 @@ public class APIServer extends NanoHTTPD {
 
         public static List<String> gatewayAddresses = new ArrayList<>(); // List of gateway addresses we are currently expecting messages from
 
+        private Context context;
+
         // Singleton
 //        private static APIServer mInstance = null;
 //
@@ -42,13 +46,14 @@ public class APIServer extends NanoHTTPD {
 //            return mInstance;
 //        }
 
-        public APIServer() {
+        public APIServer(Context context) {
             super(8080);
             try {
                 start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
             } catch (IOException e) {
                 Log.e(TAG, "API server failed to start: " + e.getMessage());
             }
+            this.context = context;
             Log.d(TAG, "API Server started on port 8080");
         }
 
@@ -62,7 +67,11 @@ public class APIServer extends NanoHTTPD {
             if (uri.equals("/")) {
                 return newFixedLengthResponse("PnrGatewayClient API Server v0.0.1");
             }
-
+            if (uri.equals("/info")) {
+                TelephonyManager manager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+                String carrierMccMnc = manager.getNetworkOperator();
+                return newFixedLengthResponse(carrierMccMnc);
+            }
             // Main register endpoint
             if (uri.equals("/register")) {
                 // Get the parameters from the request

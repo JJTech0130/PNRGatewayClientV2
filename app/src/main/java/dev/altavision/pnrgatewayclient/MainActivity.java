@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
         //mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        apiServer = new APIServer(); // Start the API server
+        apiServer = new APIServer(this); // Start the API server
 
 //        ((Button) findViewById(R.id.send_req_sms_button)).setOnClickListener(new View.OnClickListener() {
 //            @Override
