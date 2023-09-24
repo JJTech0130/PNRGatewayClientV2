@@ -17,36 +17,52 @@ import java.util.Arrays;
 public class PDUReceiver extends BroadcastReceiver {
     private static final String TAG = "PDU_RCVR";
 
+    private boolean sanityCheck(String result) {
+        return result != null && result.contains("REG-RESP");
+    }
+
+    private boolean sanityCheck(SmsMessage message) {
+        return message != null && sanityCheck(message.getMessageBody());
+    }
+
+    private String found(String input) {
+        String resdata = input.substring(input.indexOf("REG-RESP"));
+        Log.w(TAG, "PDU: " + resdata);
+        return resdata;
+    }
+
     private String parse(byte[] pdu) {
         // Print base64-encoded PDU
         Log.w(TAG, "PDU: " + new String(Base64.encode(pdu, Base64.DEFAULT)));
-//        SmsMessage message = SmsMessage.createFromPdu((byte[]) pdu, "3gpp");
-//        if (message.getMessageBody() == null) {
-//            Log.d(TAG, "Failed to get body using 3gpp parsing, trying 3gpp2...");
-//            message = SmsMessage.createFromPdu((byte[]) pdu, "3gpp2");
-//            if (message.getMessageBody() == null) {
-//                Log.d(TAG, "Failed to get body using 3gpp2 parsing, manually parsing...");
-//                // Remove non-ASCII characters from the PDU
-        String pduString = new String(pdu, 0, pdu.length, StandardCharsets.US_ASCII);
-        // Extract the message body from the PDU
-        int index = pduString.indexOf("REG-RESP");
-        if (index == -1) {
-            Log.w(TAG, "Failed to get body using manual parsing, ignoring...");
-            Log.w(TAG, "PDU: " + pduString);
-            return null;
+        Log.d(TAG, "Attempting to process message as 3gpp...");
+        try {
+            SmsMessage message = SmsMessage.createFromPdu((byte[]) pdu, "3gpp");
+            if (sanityCheck(message)) {
+                return found(message.getMessageBody());
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "The following error occurred while attempting to process PDU as 3gpp:\n" + e.toString());
         }
-        String messageBody = pduString.substring(index);
-        Log.w(TAG, "Got message body using manual parsing: " + messageBody);
-        return messageBody;
-//            }
-//        }
-//        Log.d(TAG, "Got message body using 3gpp/3gpp2 parsing: " + message.getMessageBody());
-//        // Check for REG-RESP message
-//        if (!message.getMessageBody().contains("REG-RESP")) {
-//            Log.d(TAG, "Got message that is not a REG-RESP, ignoring...");
-//            return null;
-//        }
-//        return message.getMessageBody();
+        Log.d(TAG, "Failed to get body using 3gpp parsing, trying 3gpp2...");
+        try {
+            SmsMessage message = SmsMessage.createFromPdu((byte[]) pdu, "3gpp2");
+            if (sanityCheck(message)) {
+                return found(message.getMessageBody());
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "The following error occurred while attempting to process PDU as 3gpp2:\n" + e.toString());
+        }
+        Log.d(TAG, "Failed to get body using 3gpp2 parsing, manually parsing...");
+        try {
+            String pduString = new String(pdu, 0, pdu.length, StandardCharsets.US_ASCII);
+            if (sanityCheck(pduString)) {
+                return found(pduString);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "The following error occurred while attempting to process PDU manually:\n" + e.toString());
+        }
+        Log.w(TAG, "PDU could not be deciphered.");
+        return null;
     }
 
     @Override
