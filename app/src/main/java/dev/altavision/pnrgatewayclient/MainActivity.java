@@ -10,6 +10,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.LinkAddress;
 import android.os.Bundle;
@@ -42,19 +43,33 @@ public class MainActivity extends AppCompatActivity {
         //mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         apiServer = new APIServer(this); // Start the API server
+        updateNetworks();
+    }
 
-        //Implement displaying the IP address
-        String ips = "\n";
-        ConnectivityManager cm = ((ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE));
-        List<LinkAddress> las = cm.getLinkProperties(cm.getActiveNetwork()).getLinkAddresses();
-        for(LinkAddress la : las){
-            try {
-                ips += ((Inet4Address) la.getAddress()).getHostAddress() + "\n";
-            } catch (Exception ig) {
-                Log.e(TAG, ig.toString());
-            }
-        }
+    public void updateNetworks(View view) {
+        updateNetworks();
+    }
+
+    public void updateNetworks() {
+        setContentView(R.layout.activity_main);
         TextView ip = (TextView)findViewById(R.id.ip);
+        String ips = "\n";
+        try {
+            ConnectivityManager cm = ((ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE));
+            List<LinkAddress> las = cm.getLinkProperties(cm.getActiveNetwork()).getLinkAddresses();
+            for (LinkAddress la : las) {
+                try {
+                    ips += ((Inet4Address) la.getAddress()).getHostAddress() + "\n";
+                } catch (Exception ig) {
+                    Log.e(TAG, ig.toString());
+                }
+            }
+            ip.setTextColor(Color.GREEN);
+        } catch (Exception e) {
+            Log.e(TAG, e.toString());
+            ips += "No network.\nPlease connect to the same\nnetwork as your Pypush PC.\n";
+            ip.setTextColor(Color.RED);
+        }
         ip.setText(ips);
     }
 
