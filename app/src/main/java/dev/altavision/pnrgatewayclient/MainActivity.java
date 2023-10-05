@@ -1,10 +1,18 @@
 package dev.altavision.pnrgatewayclient;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.LinkAddress;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -14,6 +22,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,67 +43,62 @@ public class MainActivity extends AppCompatActivity {
         //mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         apiServer = new APIServer(this); // Start the API server
+        updateNetworks();
+    }
 
-//        ((Button) findViewById(R.id.send_req_sms_button)).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                try {
-//
-//                    Log.d(TAG, mPrefs.getString("gateway_address","none"));
-//
-//                    if (mPrefs.getString("gateway_address","").trim().equals("")) {
-//                        Toast.makeText(MainActivity.this, "Error: Please set the gateway address in Settings", Toast.LENGTH_SHORT).show();
-//                        return;
-//                    }
-//
-//                    //Extracts the push token from the log message
-//                    String rawTokenMessage = ((TextView) findViewById(R.id.push_token_field)).getText().toString();
-//                    String regex = "\\<([a-f0-9\\ ]+)\\>";
-//
-//                    Pattern pattern = Pattern.compile(regex);
-//                    Matcher matcher = pattern.matcher(rawTokenMessage);
-//
-//                    if (matcher.find()) {
-//
-//                        String pushTokenCleaned = matcher.group(1).replaceAll("\\s", "").toUpperCase(); //Cleans up the push token so it's in the all-caps, no-spaces format
-//
-//                        //Generates a random request (r=) number
-//                        Random random = new Random();
-//                        long randomNum = (long) (random.nextDouble() * 10000000000L);
-//
-//                        //Builds the content of the REG-REQ SMS
-//                        String smsToSend = "REG-REQ?v=3;t="+pushTokenCleaned+";r="+randomNum;
-//
-//                        //Sends the SMS to the gateway address
-//                        SmsManager smsManager = SmsManager.getDefault();
-//                        smsManager.sendTextMessage(mPrefs.getString("gateway_address","none"), null, smsToSend, null, null);
-//
-//                    } else {
-//                        Log.w(TAG,"Match not found.");
-//                    }
-//
-//
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
+    public void updateNetworks(View view) {
+        updateNetworks();
+    }
 
+    public void updateNetworks() {
+        setContentView(R.layout.activity_main);
+        TextView ip = (TextView)findViewById(R.id.ip);
+        String ips = "\n";
+        try {
+            ConnectivityManager cm = ((ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE));
+            List<LinkAddress> las = cm.getLinkProperties(cm.getActiveNetwork()).getLinkAddresses();
+            for (LinkAddress la : las) {
+                try {
+                    ips += ((Inet4Address) la.getAddress()).getHostAddress() + "\n";
+                } catch (Exception ig) {
+                    Log.e(TAG, ig.toString());
+                }
+            }
+            ip.setTextColor(Color.GREEN);
+        } catch (Exception e) {
+            Log.e(TAG, e.toString());
+            ips += "No network.\nPlease connect to the same\nnetwork as your Pypush PC.\n";
+            ip.setTextColor(Color.RED);
+        }
+        ip.setText(ips);
+    }
 
-//        //Opens the settings screen on button click
-//        ((Button) findViewById(R.id.settingsButton)).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                try {
-//
-//                    Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-//                    startActivity(intent);
-//
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
+    public void smsPerms(View view) {
+        requestPermissionLauncher.launch(Manifest.permission.SEND_SMS);
+        requestPermissionLauncher.launch(Manifest.permission.RECEIVE_SMS);
+    }
+    private ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    // Permission is granted. Continue the action or workflow in your
+                    // app.
+                    showToast("Awesome!  I can now send and receive SMS!");
+                } else {
+                    // Explain to the user that the feature is unavailable because the
+                    // feature requires a permission that the user has denied. At the
+                    // same time, respect the user's decision. Don't link to system
+                    // settings in an effort to convince the user to change their
+                    // decision.
+                    showToast("You denied, you silly goose!  Now you'll have to grant in settings.");
+                }
+            });
+
+    public void showToast(String textstr) {
+        CharSequence text = textstr;
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(this /* MyActivity */, text, duration);
+        toast.show();
     }
 
 }

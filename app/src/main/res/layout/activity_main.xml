@@ -19,10 +19,11 @@
         app:srcCompat="@drawable/logo" />
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:id="@+id/linearLayout"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
         android:gravity="center"
         android:orientation="vertical"
         android:paddingStart="32dp"
@@ -35,60 +36,71 @@
             android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Make sure the app has SMS and notification permissions, and set the gateway address in Settings"
+            android:gravity="center"
+            android:text="Make sure the app has SMS permission."
             android:textColor="#FFFFFF"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:gravity="center"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/textView2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="x"
-            android:textColor="#111111"/>
-
-        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Paste in a log message with the push token in &lt;brackets&gt;"
-            android:textColor="#FFFFFF"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:hint="Push token"
-            android:gravity="center"
-            />
+            android:text="Then, run an instance of Pypush with the following for &quot;--phone&quot;:"
+            android:textAlignment="center"
+            android:textColor="#FFFFFF" />
 
-        <EditText
-            android:id="@+id/push_token_field"
+        <TextView
+            android:id="@+id/ip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="updateNetworks"
+            android:text="Displaying IP Address coming soon!  For now, just check:"
+            android:textAlignment="center"
+            android:textColor="#00FF00"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/textView4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:backgroundTint="#FFFFFF"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:textColor="#FFFFFF"
-            />
-
-        <Button
-            android:id="@+id/send_req_sms_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Send REG-REQ SMS!" />
+            android:text="About Phone -> Status Info -> IP Address"
+            android:textAlignment="center"
+            android:textColor="#FFFFFF" />
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/settingsButton"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
         android:layout_marginBottom="32dp"
-        android:text="Open Settings"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/blue"
+            android:onClick="updateNetworks"
+            android:text="Update Network Status"
+            android:textColor="@color/white" />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/blue"
+            android:onClick="smsPerms"
+            android:text="Grant SMS Permissions"
+            android:textColor="@color/white" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
