@@ -111,7 +111,7 @@ public class APIServer extends NanoHTTPD {
                 APIServer.gatewayAddresses.add(gatewayPhoneNumber);
 
                 String acceptableResponse = null;
-                int timeout = 150;
+                int timeout = 300;
 
                 while (acceptableResponse == null && timeout > 0) {
                     timeout--;
