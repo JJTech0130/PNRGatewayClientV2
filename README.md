@@ -1,5 +1,3 @@
-# PNRGatewayClientV2
-PNRGatewayClient, but SIMLess!
+# pypush "Helper App"
 
-Howdy! This is the Android app side for the [SIMLessPNRGateway](https://github.com/AwesomeIndustry/SIMLessPNRGateway) system. Most of the explanation for how to set it up is on the [SIMLessPNRGateway](https://github.com/AwesomeIndustry/SIMLessPNRGateway) page, so go
-check that out first :)
+This is the helper app for pypush's SMS registration functionality. Please check out the `sms-registration` branch of pypush for details.
